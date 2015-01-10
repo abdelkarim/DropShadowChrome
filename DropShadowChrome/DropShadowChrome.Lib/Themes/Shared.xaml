@@ -1,0 +1,20 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- SHAPES -->
+    <Geometry x:Key="MaximizeGeometry">
+        M 0,0 10,0 10,10 0,10 Z
+        M 1,3 9,3 9,9 1,9 Z
+    </Geometry>
+
+    <Geometry x:Key="RestoreGeometry">
+        M 2,3 3,3 3,2 9,2 9,6 8,6 8,7 10,7 10,0 2,0 Z
+        M 0,3 8,3 8,10 0,10 Z
+        M 1,5 7,5 7,9 1,9 Z
+    </Geometry>
+
+    <Geometry x:Key="WindowCloseShapeGeometry">
+        M 0,1 0,2 1,2 1,3 2,3 2,4 3,4 3,6 2,6 2,7 1,7 1,8 0,8 0,9 1,9 1,10 2,10 2,9 3,9 3,8 4,8 4,7 6,7 6,8 7,8 7,9 8,9 8,10 9,10 9,9 10,9 10,8 9,8 9,7 8,7 8,6 7,6 7,4 8,4 8,3 9,3 9,2 10,2 10,1 9,1 9,0 8,0 8,1 7,1 7,2 6,2 6,3 4,3 4,2 3,2 3,1 2,1 2,0 1,0 1,1 Z
+    </Geometry>
+
+</ResourceDictionary>

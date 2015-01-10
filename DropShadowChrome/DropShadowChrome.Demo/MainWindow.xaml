@@ -1,0 +1,12 @@
+﻿<lib:XWindow x:Class="DropShadowChrome.Demo.MainWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lib="clr-namespace:DropShadowChrome.Lib;assembly=DropShadowChrome.Lib"
+             Title="Inbox - abdelkarim.se@gmail.com - Outlook"
+             Icon="Assets/Outlook.ico"
+             Height="400"
+             Width="600">
+    <Grid>
+        
+    </Grid>
+</lib:XWindow>
