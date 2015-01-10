@@ -12,7 +12,6 @@ namespace DropShadowChrome.Lib.Core
         private Window _window;
         private DropShadowChrome _dropShadow;
         private IntPtr _wndHandle;
-        /*private HwndSource _hwndSource;*/
         private const int GlowSize = 6;
         private GlowHwndSource[] _glowWindows = new GlowHwndSource[4];
         private GlowHwndSource _topGlowWnd;
@@ -77,7 +76,6 @@ namespace DropShadowChrome.Lib.Core
             _wndHandle = new WindowInteropHelper(window).Handle;
             if (_wndHandle != IntPtr.Zero)
             {
-                /*_hwndSource = HwndSource.FromHwnd(_wndHandle);*/
                 // if a dropshadow is specified,
                 if (_dropShadow != null)
                     ApplyShadow();
@@ -107,10 +105,10 @@ namespace DropShadowChrome.Lib.Core
 
         private void InvalidateGlowsRect()
         {
-            if (_wndHandle == IntPtr.Zero /*|| _hwndSource == null*/)
+            if (_wndHandle == IntPtr.Zero)
                 return;
 
-            var newRect = new Rect(_window.PointToScreen(new Point()), new Size(_window.Width, _window.Height));
+            var newRect = GetWindowRect();
             var uFlags = SWP.NOACTIVATE;
 
             NativeMethods.SetWindowPos(_topGlowWnd.Handle,
@@ -151,7 +149,6 @@ namespace DropShadowChrome.Lib.Core
         {
             var window = (Window)sender;
             _wndHandle = new WindowInteropHelper(window).Handle;
-            /*_hwndSource = HwndSource.FromHwnd(_wndHandle);*/
 
             if (_dropShadow != null)
             {
@@ -207,8 +204,7 @@ namespace DropShadowChrome.Lib.Core
 
         private void InitializeGlowWindows()
         {
-            var rect = new Rect(_window.PointToScreen(new Point()),
-                                new Size(_window.ActualWidth, _window.ActualHeight));
+            var rect = GetWindowRect();
 
             _topGlowWnd = _glowWindows[0] = CreateGlowWindow((int)(rect.Width + 8),
                                            GlowSize,
@@ -234,6 +230,16 @@ namespace DropShadowChrome.Lib.Core
                                              (int)(rect.Top - 2),
                                              Dock.Right);
             _isGlowWindowsInitialized = true;
+        }
+
+        private Rect GetWindowRect()
+        {
+            RECT nativeRect;
+            NativeMethods.GetWindowRect(_wndHandle, out nativeRect);
+            return new Rect(new Point(nativeRect.Left, nativeRect.Top), new Point(nativeRect.Right, nativeRect.Bottom));
+
+            /*return new Rect(_window.PointToScreen(new Point()),
+                            new Size(_window.ActualWidth, _window.ActualHeight));*/
         }
 
         private GlowHwndSource CreateGlowWindow(int width, int height, int x, int y, Dock dock)
@@ -282,149 +288,5 @@ namespace DropShadowChrome.Lib.Core
         }
 
         #endregion
-
-        /*private static class GlowRootElementFactory
-        {
-            private static DropShadowEffect GetShadowEffect(DropShadowController dropShadow)
-            {
-                var dropShadowColorBinding = new Binding
-                {
-                    Source = dropShadow,
-                    Path = new PropertyPath("DropShadowColor"),
-                    Mode = BindingMode.OneWay
-                };
-                var dropShadowEffect = new DropShadowEffect
-                {
-                    ShadowDepth = 0,
-                    BlurRadius = 8
-                };
-                BindingOperations.SetBinding(dropShadowEffect, DropShadowEffect.ColorProperty, dropShadowColorBinding);
-
-                return dropShadowEffect;
-            }
-
-            internal static UIElement GetTopGlowRoot(DropShadowController dropShadow)
-            {
-                var root = new Border
-                {
-                    SnapsToDevicePixels = true,
-                    ClipToBounds = true,
-                    Height = GlowSize
-                };
-
-                var borderBrushBinding = new Binding
-                {
-                    Source = dropShadow,
-                    Path = new PropertyPath("BorderBrush"),
-                    Mode = BindingMode.OneWay
-                };
-
-                var element = new Border
-                {
-                    Height = 1,
-                    Margin = new Thickness(3, 0, 3, 0),
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    SnapsToDevicePixels = true,
-                    Effect = GetShadowEffect(dropShadow)
-                };
-                element.SetBinding(Border.BackgroundProperty, borderBrushBinding);
-
-                root.Child = element;
-
-                return root;
-            }
-
-            internal static UIElement GetBottomGlowRoot(DropShadowController dropShadow)
-            {
-                var root = new Border
-                {
-                    SnapsToDevicePixels = true,
-                    ClipToBounds = true,
-                    Height = GlowSize
-                };
-
-                var borderBrushBinding = new Binding
-                {
-                    Source = dropShadow,
-                    Path = new PropertyPath("BorderBrush"),
-                    Mode = BindingMode.OneWay
-                };
-
-                var element = new Border
-                {
-                    Height = 1,
-                    Margin = new Thickness(3, 0, 3, 0),
-                    VerticalAlignment = VerticalAlignment.Top,
-                    SnapsToDevicePixels = true,
-                    Effect = GetShadowEffect(dropShadow)
-                };
-                element.SetBinding(Border.BackgroundProperty, borderBrushBinding);
-
-                root.Child = element;
-
-                return root;
-            }
-
-            internal static UIElement GetLeftGlowRoot(DropShadowController dropShadow)
-            {
-                var root = new Border
-                {
-                    SnapsToDevicePixels = true,
-                    ClipToBounds = true,
-                    Width = GlowSize
-                };
-                var borderBrushBinding = new Binding
-                {
-                    Source = dropShadow,
-                    Path = new PropertyPath("BorderBrush"),
-                    Mode = BindingMode.OneWay
-                };
-
-                var element = new Border
-                {
-                    Width = 1,
-                    Margin = new Thickness(0, 1, 0, 1),
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    SnapsToDevicePixels = true,
-                    Background = new SolidColorBrush(Colors.DarkRed),
-                    Effect = GetShadowEffect(dropShadow)
-                };
-                element.SetBinding(Border.BackgroundProperty, borderBrushBinding);
-                root.Child = element;
-
-                return root;
-            }
-
-            internal static UIElement GetRightGlowRoot(DropShadowController dropShadow)
-            {
-                var root = new Border
-                {
-                    SnapsToDevicePixels = true,
-                    ClipToBounds = true,
-                    Width = GlowSize
-                };
-
-                var borderBrushBinding = new Binding
-                {
-                    Source = dropShadow,
-                    Path = new PropertyPath("BorderBrush"),
-                    Mode = BindingMode.OneWay
-                };
-
-                var element = new Border
-                {
-                    Width = 1,
-                    Margin = new Thickness(0, 1, 0, 1),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    SnapsToDevicePixels = true,
-                    Background = new SolidColorBrush(Colors.DarkRed),
-                    Effect = GetShadowEffect(dropShadow)
-                };
-                element.SetBinding(Border.BackgroundProperty, borderBrushBinding);
-                root.Child = element;
-
-                return root;
-            }
-        }*/
     }
 }
