@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 
@@ -77,6 +78,62 @@ namespace DropShadowChrome.Lib
                             wnd.WindowState = WindowState.Normal;
                     }));
         }
+
+        #endregion
+
+        #region "Properties"
+
+        #region RightAdditionalContent
+
+        /// <summary>
+        /// Identifies the <see cref="RightAdditionalContent"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty RightAdditionalContentProperty = DependencyProperty.Register(
+            "RightAdditionalContent",
+            typeof(object),
+            typeof(XWindow),
+            new FrameworkPropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the RightAdditionalContent property. This is a dependency property.
+        /// </summary>
+        /// <value>
+        ///
+        /// </value>
+        [Bindable(true)]
+        public object RightAdditionalContent
+        {
+            get { return (object)GetValue(RightAdditionalContentProperty); }
+            set { SetValue(RightAdditionalContentProperty, value); }
+        }
+
+        #endregion
+
+        #region LeftAdditionalContent
+
+        /// <summary>
+        /// Identifies the <see cref="LeftAdditionalContent"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty LeftAdditionalContentProperty = DependencyProperty.Register(
+            "LeftAdditionalContent",
+            typeof(object),
+            typeof(XWindow),
+            new FrameworkPropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the LeftAdditionalContent property. This is a dependency property.
+        /// </summary>
+        /// <value>
+        ///
+        /// </value>
+        [Bindable(true)]
+        public object LeftAdditionalContent
+        {
+            get { return (object)GetValue(LeftAdditionalContentProperty); }
+            set { SetValue(LeftAdditionalContentProperty, value); }
+        }
+
+        #endregion
 
         #endregion
     }

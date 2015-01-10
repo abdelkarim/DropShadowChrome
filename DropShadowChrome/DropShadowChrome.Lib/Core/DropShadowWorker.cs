@@ -304,6 +304,9 @@ namespace DropShadowChrome.Lib.Core
 
         private void ShowGlowWindows()
         {
+            if (_window.WindowState == WindowState.Maximized)
+                return;
+
             foreach (var hwndSource in _glowWindows)
                 NativeMethods.ShowWindow(hwndSource.Handle, (int)SW.SHOWNOACTIVATE);
         }

@@ -35,7 +35,7 @@ SOFTWARE.
     <SolidColorBrush x:Key="WindowButtonMouseOverBackgroundBrush" Color="#CDE6F7" />
     <SolidColorBrush x:Key="WindowButtonPressedBackgroundBrush" Color="#92C0E0" />
 
-    <Style x:Key="TitleBarButtonStyle" TargetType="Button">
+    <Style x:Key="BaseTitleBarButtonStyle" TargetType="Button">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Background" Value="{StaticResource WindowButtonActiveBackgroundBrush}" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -73,6 +73,11 @@ SOFTWARE.
     <Thickness x:Key="WindowsNormalStatePadding">0,4,0,0</Thickness>
 
     <Style TargetType="lib:XWindow">
+        <Style.Resources>
+            <Style x:Key="TitleBarButtonStyle"
+                   BasedOn="{StaticResource BaseTitleBarButtonStyle}"
+                   TargetType="Button" />
+        </Style.Resources>
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
                 <WindowChrome GlassFrameThickness="0"
@@ -96,14 +101,16 @@ SOFTWARE.
                             <DockPanel>
                                 <DockPanel x:Name="TitleBar"
                                            Dock="Top">
-                                    <Image x:Name="Icon"
-                                           Source="{TemplateBinding Icon}"
-                                           Stretch="Uniform"
-                                           Margin="10,0"
-                                           Width="16"
-                                           Height="16"
-                                           DockPanel.Dock="Left"
-                                           VerticalAlignment="Center"/>
+                                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                                        <Image x:Name="Icon"
+                                               Source="{TemplateBinding Icon}"
+                                               Stretch="Uniform"
+                                               Margin="10,0"
+                                               Width="16"
+                                               Height="16"
+                                               VerticalAlignment="Center" />
+                                        <ContentPresenter Content="{TemplateBinding LeftAdditionalContent}" />
+                                    </StackPanel>
 
                                     <StackPanel x:Name="WindowButtons"
                                                 DockPanel.Dock="Right"
@@ -111,13 +118,17 @@ SOFTWARE.
                                                 WindowChrome.IsHitTestVisibleInChrome="True"
                                                 VerticalAlignment="Top"
                                                 TextElement.Foreground="#777777">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="Button" BasedOn="{StaticResource BaseTitleBarButtonStyle}" />
+                                        </StackPanel.Resources>
+                                        
+                                        <ContentPresenter Content="{TemplateBinding RightAdditionalContent}" />
                                         <Button x:Name="MinimizeButton"
                                                 DockPanel.Dock="Right"
                                                 ToolTip="Minimize"
                                                 Command="lib:WindowCommands.MinimizeCommand"
                                                 VerticalContentAlignment="Bottom"
-                                                Padding="0,0,0,8"
-                                                Style="{StaticResource TitleBarButtonStyle}">
+                                                Padding="0,0,0,8">
                                             <Button.Content>
                                                 <Path x:Name="MinimizeIcon"
                                                       Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
@@ -129,7 +140,6 @@ SOFTWARE.
                                             </Button.Content>
                                         </Button>
                                         <Button x:Name="MaxResButton"
-                                            Style="{StaticResource TitleBarButtonStyle}"
                                             ToolTip="Maximize"
                                             Command="lib:WindowCommands.MaximizeRestoreCommand">
                                             <Button.Content>
@@ -140,7 +150,6 @@ SOFTWARE.
                                             </Button.Content>
                                         </Button>
                                         <Button ToolTip="Close"
-                                                Style="{StaticResource TitleBarButtonStyle}"
                                                 Command="lib:WindowCommands.CloseCommand">
                                             <Button.Content>
                                                 <Path Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
@@ -166,6 +175,9 @@ SOFTWARE.
                     </Border>
 
                     <ControlTemplate.Triggers>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="Icon" Property="Margin" Value="0" />
+                        </Trigger>
                         <Trigger Property="WindowState" Value="Maximized">
                             <Setter TargetName="MaxRestoreIcon" Property="Data" Value="{StaticResource RestoreGeometry}" />
                             <Setter TargetName="MaxResButton" Property="ToolTip" Value="Restore Down" />

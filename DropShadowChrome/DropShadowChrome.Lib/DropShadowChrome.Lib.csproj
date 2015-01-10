@@ -52,6 +52,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\OutlineTextBlock.cs" />
     <Compile Include="Core\DropShadowWorker.cs" />
     <Compile Include="Core\GlowHwndSource.cs" />
     <Compile Include="Core\NativeMethods.cs" />
