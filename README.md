@@ -1,5 +1,5 @@
 # DropShadowChrome
-***DropShadowChrome*** is a library that allows the user to apply a drop-shadow to a newly styled window with ease.
+***DropShadowChrome*** is a library that allows the user to apply a drop-shadow to a window.
 
 ![Sample](Images/DropShadowChrome.png "Demo")
 
