@@ -72,6 +72,7 @@ namespace DropShadowChrome.Lib.Core
             _window.Closed += OnWindowClosed;
             _window.SizeChanged += OnSizeChanged;
             _window.LocationChanged += OnLocationChanged;
+            _window.StateChanged += OnStateChanged;
 
             _wndHandle = new WindowInteropHelper(window).Handle;
             if (_wndHandle != IntPtr.Zero)
@@ -84,6 +85,19 @@ namespace DropShadowChrome.Lib.Core
             {
                 _window.SourceInitialized += OnSourceInitialized;
             }
+        }
+
+        private void OnStateChanged(object sender,
+                                    EventArgs eventArgs)
+        {
+            // in case the window is not yet initialized.
+            if (_wndHandle == IntPtr.Zero)
+                return;
+
+            if (_window.WindowState == WindowState.Normal)
+                ShowGlowWindows();
+            else
+                HideGlowWindows();
         }
 
         private void OnLocationChanged(object sender,
@@ -237,9 +251,6 @@ namespace DropShadowChrome.Lib.Core
             RECT nativeRect;
             NativeMethods.GetWindowRect(_wndHandle, out nativeRect);
             return new Rect(new Point(nativeRect.Left, nativeRect.Top), new Point(nativeRect.Right, nativeRect.Bottom));
-
-            /*return new Rect(_window.PointToScreen(new Point()),
-                            new Size(_window.ActualWidth, _window.ActualHeight));*/
         }
 
         private GlowHwndSource CreateGlowWindow(int width, int height, int x, int y, Dock dock)
@@ -267,7 +278,13 @@ namespace DropShadowChrome.Lib.Core
         private void ShowGlowWindows()
         {
             foreach (var hwndSource in _glowWindows)
-                NativeMethods.ShowWindow(hwndSource.Handle, (int)SW.SHOW);
+                NativeMethods.ShowWindow(hwndSource.Handle, (int)SW.SHOWNOACTIVATE);
+        }
+
+        private void HideGlowWindows()
+        {
+            foreach (var glowWindow in _glowWindows)
+                NativeMethods.ShowWindow(glowWindow.Handle, (int) SW.HIDE);
         }
 
         private void RemoveShadowElements()

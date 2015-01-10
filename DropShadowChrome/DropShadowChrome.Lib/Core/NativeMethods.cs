@@ -51,6 +51,7 @@ namespace DropShadowChrome.Lib.Core
     {
         HIDE = 0,
         SHOW = 5,
+        SHOWNOACTIVATE = 4
     }
 
     [Flags]
