@@ -22,17 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
+using DropShadowChrome.Lib.Core;
 
 namespace DropShadowChrome.Lib
 {
     /// <summary>
     /// 
     /// </summary>
+    [TemplatePart(Name = "PART_IconPlaceHolder", Type = typeof(Border))]
     public class XWindow : Window
     {
+        #region "Fields"
+
+        private Border _iconPlaceHolder;
+        private bool _isSystemMenuOpen;
+
+        #endregion
+
         #region "Constructors"
 
         /// <summary>
@@ -77,6 +90,97 @@ namespace DropShadowChrome.Lib
                         else if (wnd.WindowState == WindowState.Maximized)
                             wnd.WindowState = WindowState.Normal;
                     }));
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            if (_iconPlaceHolder != null)
+            {
+                _iconPlaceHolder.MouseLeftButtonDown -= OnIconMouseLeftButtonDown;
+            }
+
+            _iconPlaceHolder = GetTemplateChild("PART_IconPlaceHolder") as Border;
+            if (_iconPlaceHolder != null)
+                _iconPlaceHolder.MouseLeftButtonDown += OnIconMouseLeftButtonDown;
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            var hwndSource = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
+            if (hwndSource != null)
+            {
+                hwndSource.AddHook(new HwndSourceHook(MessageHandle));
+            }
+        }
+
+        private IntPtr MessageHandle(IntPtr hwnd,
+                                     int msg,
+                                     IntPtr wParam,
+                                     IntPtr lParam,
+                                     ref bool handled)
+        {
+            WM message = (WM) msg;
+            if (message == WM.UNINITMENUPOPUP)
+            {
+                var systemMenuHandle = NativeMethods.GetSystemMenu(hwnd, false);
+
+                if (systemMenuHandle == wParam &&
+                    _isSystemMenuOpen &&
+                    !IsMouseOverIcon())
+                {
+                    _isSystemMenuOpen = false;
+                }
+            }
+
+            return IntPtr.Zero;
+        }
+
+        private bool IsMouseOverIcon()
+        {
+            if (_iconPlaceHolder == null)
+                return false;
+
+            POINT screenPoint;
+            NativeMethods.GetCursorPos(out screenPoint);
+            var mousePos = _iconPlaceHolder.PointFromScreen(screenPoint);
+            var rect = LayoutInformation.GetLayoutSlot(_iconPlaceHolder);
+            return rect.Contains(mousePos);
+        }
+
+        private void OnIconMouseLeftButtonDown(object sender,
+                                               MouseButtonEventArgs e)
+        {
+            if (e.ClickCount >= 2)
+            {
+                this.Close();
+                return;
+            }
+
+            var wndHandle = new WindowInteropHelper(this).Handle;
+            var hMenu = NativeMethods.GetSystemMenu(wndHandle, false);
+
+            if (_isSystemMenuOpen)
+            {
+                _isSystemMenuOpen = false;
+                NativeMethods.ShowWindow(hMenu, (int) SW.HIDE);
+                return;
+            }
+
+            var screenPoint = _iconPlaceHolder.PointToScreen(new Point(8, _iconPlaceHolder.ActualHeight + 3));
+            _isSystemMenuOpen = true;
+            var selectedCommand = NativeMethods.TrackPopupMenuEx(hMenu,
+                                                                 (uint) (TPM.LEFTALIGN | TPM.RETURNCMD),
+                                                                 (int) screenPoint.X,
+                                                                 (int) screenPoint.Y,
+                                                                 wndHandle,
+                                                                 IntPtr.Zero);
+            
+            // if the user did select and menu item.
+            if (selectedCommand != 0)
+                NativeMethods.PostMessage(wndHandle, (uint) WM.SYSCOMMAND, new IntPtr(selectedCommand), IntPtr.Zero);
         }
 
         #endregion

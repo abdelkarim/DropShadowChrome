@@ -102,13 +102,17 @@ SOFTWARE.
                                 <DockPanel x:Name="TitleBar"
                                            Dock="Top">
                                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                                        <Image x:Name="Icon"
-                                               Source="{TemplateBinding Icon}"
-                                               Stretch="Uniform"
-                                               Margin="10,0"
-                                               Width="16"
-                                               Height="16"
-                                               VerticalAlignment="Center" />
+                                        <Border x:Name="PART_IconPlaceHolder"
+                                                Padding="10,0"
+                                                Background="Transparent"
+                                                WindowChrome.IsHitTestVisibleInChrome="True">
+                                            <Image x:Name="Icon"
+                                                   Source="{TemplateBinding Icon}"
+                                                   Stretch="Uniform"
+                                                   Width="16"
+                                                   Height="16"
+                                                   VerticalAlignment="Center" />
+                                        </Border>
                                         <ContentPresenter Content="{TemplateBinding LeftAdditionalContent}" />
                                     </StackPanel>
 

@@ -56,6 +56,13 @@
     <Compile Include="Core\DropShadowWorker.cs" />
     <Compile Include="Core\GlowHwndSource.cs" />
     <Compile Include="Core\NativeMethods.cs" />
+    <Compile Include="Core\POINT.cs" />
+    <Compile Include="Core\RECT.cs" />
+    <Compile Include="Core\SW.cs" />
+    <Compile Include="Core\SWP.cs" />
+    <Compile Include="Core\TPM.cs" />
+    <Compile Include="Core\VM.cs" />
+    <Compile Include="Core\WS.cs" />
     <Compile Include="DropShadowChrome.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

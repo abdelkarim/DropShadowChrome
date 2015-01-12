@@ -57,44 +57,41 @@ namespace DropShadowChrome.Lib.Core
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-    }
 
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct RECT
-    {
-        public int Left;        // x position of upper-left corner
-        public int Top;         // y position of upper-left corner
-        public int Right;       // x position of lower-right corner
-        public int Bottom;      // y position of lower-right corner
-    }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="bRevert"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll")]
+        internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
 
-    /// <summary>
-    /// ShowWindow options
-    /// </summary>
-    internal enum SW
-    {
-        HIDE = 0,
-        SHOW = 5,
-        SHOWNOACTIVATE = 4
-    }
+        /// <summary>
+        /// Displays a shortcut menu at the specified location and tracks the selection of items
+        /// on the shortcut menu. The shortcut menu can appear anywhere on the screen.
+        /// </summary>
+        [DllImport("user32.dll")]
+        internal static extern uint TrackPopupMenuEx(IntPtr hMenu, uint fuFlags, int x, int y, IntPtr hwnd, IntPtr lptpm);
 
-    [Flags]
-    internal enum WS : uint
-    {
-        VISIBLE = 0x10000000,
-        CHILD = 0x40000000,
-        DISABLED = 0x08000000,
-        CLIPSIBLINGS = 0x04000000,
-        CLIPCHILDREN = 0x02000000,
-        POPUP = 0x80000000
-    }
+        [DllImport("user32.dll")]
+        static extern bool DeleteMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
-    /// <summary>
-    /// SetWindowPos options
-    /// </summary>
-    [Flags]
-    internal enum SWP
-    {
-        NOACTIVATE = 0x0010
+        /// <summary>
+        /// Places (posts) a message in the message queue associated with the thread that
+        /// created the specified window and returns without waiting for the thread to process the message.
+        /// </summary>
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lpPoint"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(out POINT lpPoint);
     }
 }
