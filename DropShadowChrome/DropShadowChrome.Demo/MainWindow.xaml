@@ -2,10 +2,21 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:lib="clr-namespace:DropShadowChrome.Lib;assembly=DropShadowChrome.Lib"
+             xmlns:demo="clr-namespace:DropShadowChrome.Demo"
              Title="Inbox - abdelkarim.se@gmail.com - Outlook"
              Icon="Assets/Outlook.ico"
              Height="400"
              Width="600">
+    
+    <lib:XWindow.DataContext>
+        <demo:MainViewModel />
+    </lib:XWindow.DataContext>
+    
+    <lib:XWindow.SystemMenuItems>
+        <lib:SystemMenuSeparator />
+        <lib:SystemMenuItem Header="About" Command="{Binding Path=AboutCommand}" />
+        <lib:SystemMenuItem Header="Settings" Command="{Binding Path=AboutCommand}" />
+    </lib:XWindow.SystemMenuItems>
 
     <lib:XWindow.RightAdditionalContent>
         <Button x:Name="PinButton">

@@ -23,7 +23,12 @@ SOFTWARE.
 */
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -43,6 +48,10 @@ namespace DropShadowChrome.Lib
 
         private Border _iconPlaceHolder;
         private bool _isSystemMenuOpen;
+        private ObservableCollection<SystemMenuBase> _systemMenuItems;
+        private bool _parseSystemMenuItems;
+        private uint _id;
+        const int MAX = 0xF000;
 
         #endregion
 
@@ -109,29 +118,56 @@ namespace DropShadowChrome.Lib
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-            var hwndSource = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
-            if (hwndSource != null)
-            {
-                hwndSource.AddHook(new HwndSourceHook(MessageHandle));
-            }
+            var hWndSource = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
+            if (hWndSource == null) return;
+            hWndSource.AddHook(WndProc);
+
+            if (!_parseSystemMenuItems) return;
+
+            _parseSystemMenuItems = false;
+            AddSystemMenuItems(hWndSource.Handle,
+                NativeMethods.GetSystemMenu(hWndSource.Handle, false),
+                SystemMenuItems);
         }
 
-        private IntPtr MessageHandle(IntPtr hwnd,
-                                     int msg,
-                                     IntPtr wParam,
-                                     IntPtr lParam,
-                                     ref bool handled)
+        private IntPtr WndProc(IntPtr hwnd,
+                               int msg,
+                               IntPtr wParam,
+                               IntPtr lParam,
+                               ref bool handled)
         {
             WM message = (WM) msg;
             if (message == WM.UNINITMENUPOPUP)
             {
                 var systemMenuHandle = NativeMethods.GetSystemMenu(hwnd, false);
-
                 if (systemMenuHandle == wParam &&
                     _isSystemMenuOpen &&
                     !IsMouseOverIcon())
                 {
                     _isSystemMenuOpen = false;
+                }
+            }
+
+            if (message == WM.INITMENUPOPUP)
+            {
+                // if system menu item is about to be open
+                var systemMenuHandle = NativeMethods.GetSystemMenu(hwnd, false);
+                if (systemMenuHandle == wParam)
+                {
+                    foreach (var menuItem in this.SystemMenuItems)
+                    {
+                        menuItem.InvalidateState();
+                    }
+                }
+            }
+
+            if (message == WM.SYSCOMMAND)
+            {
+                var menuItem = SystemMenuItems.OfType<SystemMenuItem>().FirstOrDefault(sm => sm.Id == (uint) wParam);
+                if (menuItem != null)
+                {
+                    menuItem.RaiseClickEvent();
+                    handled = true;
                 }
             }
 
@@ -150,8 +186,7 @@ namespace DropShadowChrome.Lib
             return rect.Contains(mousePos);
         }
 
-        private void OnIconMouseLeftButtonDown(object sender,
-                                               MouseButtonEventArgs e)
+        private void OnIconMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount >= 2)
             {
@@ -171,8 +206,9 @@ namespace DropShadowChrome.Lib
 
             var screenPoint = _iconPlaceHolder.PointToScreen(new Point(8, _iconPlaceHolder.ActualHeight + 3));
             _isSystemMenuOpen = true;
+            var direction = FlowDirection == FlowDirection.LeftToRight ? TPM.LEFTALIGN : TPM.RIGHTALIGN;
             var selectedCommand = NativeMethods.TrackPopupMenuEx(hMenu,
-                                                                 (uint) (TPM.LEFTALIGN | TPM.RETURNCMD),
+                                                                 (uint) (direction| TPM.RETURNCMD),
                                                                  (int) screenPoint.X,
                                                                  (int) screenPoint.Y,
                                                                  wndHandle,
@@ -239,6 +275,97 @@ namespace DropShadowChrome.Lib
 
         #endregion
 
+        public ObservableCollection<SystemMenuBase> SystemMenuItems
+        {
+            get
+            {
+                if (_systemMenuItems == null)
+                {
+                    _systemMenuItems = new ObservableCollection<SystemMenuBase>();
+                    _systemMenuItems.CollectionChanged += OnSystemMenuItemsChanged;
+                }
+
+                return _systemMenuItems;
+            }
+        }
+
         #endregion
+
+        private void OnSystemMenuItemsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var hWnd = new WindowInteropHelper(this).Handle;
+            if (hWnd == IntPtr.Zero)
+            {
+                _parseSystemMenuItems = true;
+                return;
+            }
+
+            var sysMenu = NativeMethods.GetSystemMenu(hWnd, false);
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                {
+                    AddSystemMenuItems(hWnd, sysMenu, e.NewItems.Cast<SystemMenuBase>());
+                    break;
+                }
+                case NotifyCollectionChangedAction.Remove:
+                {
+                    RemoveSystemMenuItems(sysMenu, e.OldItems.Cast<SystemMenuBase>());
+                    break;
+                }
+            }
+        }
+
+        private void AddSystemMenuItems(IntPtr hWnd, IntPtr hMenu, IEnumerable<SystemMenuBase> items)
+        {
+            foreach (SystemMenuBase item in items)
+            {
+                item.Id = NextId();
+
+                if (item is SystemMenuSeparator)
+                {
+                    NativeMethods.AppendMenu(hMenu, MF.SEPARATOR, item.Id, string.Empty);
+                    continue;
+                }
+
+                if (item is SystemMenuItem)
+                {
+                    var menuItem = (SystemMenuItem)item;
+                    this.AddLogicalChild(menuItem);
+
+                    NativeMethods.AppendMenu(hMenu, MF.STRING, item.Id, SystemMenuItem.EscapeHeader(menuItem.Header));
+                    menuItem.WindowHandle = hWnd;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Will generate an Id to be used in a <see cref="SystemMenuBase"/> instance.
+        /// </summary>
+        /// <returns></returns>
+        private uint NextId()
+        {
+            var nextId = _id++;
+
+            if (nextId >= MAX)
+                throw new InvalidOperationException("You have reached the maximum number of menu items.");
+
+            return nextId;
+        }
+
+        private void RemoveSystemMenuItems(IntPtr hMenu, IEnumerable<SystemMenuBase> items)
+        {
+            foreach (var item in items)
+            {
+                var menuItem = item as SystemMenuItem;
+                if (menuItem != null)
+                {
+                    menuItem.WindowHandle = IntPtr.Zero;
+                    this.RemoveLogicalChild(menuItem);
+                }
+
+                NativeMethods.DeleteMenu(hMenu, item.Id, (uint) MF.BYCOMMAND);
+            }
+        }
     }
 }
