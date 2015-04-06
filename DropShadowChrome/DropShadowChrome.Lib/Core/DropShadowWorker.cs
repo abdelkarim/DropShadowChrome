@@ -283,13 +283,15 @@ namespace DropShadowChrome.Lib.Core
         private GlowHwndSource CreateGlowWindow(int width, int height, int x, int y, Dock dock)
         {
             var windowStyle = (uint)(WS.POPUP | WS.CLIPCHILDREN | WS.CLIPCHILDREN | WS.DISABLED);
+            int extendedWindowStyle = (int)(WS_EX.TRANSPARENT);
             var parameters = new HwndSourceParameters("GlowWindow", width, height)
             {
                 ParentWindow = _wndHandle,
                 UsesPerPixelOpacity = true,
                 PositionX = x,
                 PositionY = y,
-                WindowStyle = (int)windowStyle
+                WindowStyle = (int)windowStyle,
+                ExtendedWindowStyle = extendedWindowStyle
             };
             var hwndSource = new GlowHwndSource(parameters)
             {

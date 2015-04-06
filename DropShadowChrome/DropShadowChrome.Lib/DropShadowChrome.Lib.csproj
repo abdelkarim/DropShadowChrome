@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\OutlineTextBlock.cs" />
+    <Compile Include="Core\WS_EX.cs" />
     <Compile Include="Core\MENUITEMINFO.cs" />
     <Compile Include="Core\MF.cs" />
     <Compile Include="Core\DropShadowWorker.cs" />
