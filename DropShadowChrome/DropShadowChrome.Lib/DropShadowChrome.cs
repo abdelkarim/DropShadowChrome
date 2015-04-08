@@ -110,7 +110,7 @@ namespace DropShadowChrome.Lib
             "Density",
             typeof(double),
             typeof(DropShadowChrome),
-            new FrameworkPropertyMetadata(0.7));
+            new FrameworkPropertyMetadata(0.6));
 
         /// <summary>
         /// Gets or sets the Density property. This is a dependency property.
