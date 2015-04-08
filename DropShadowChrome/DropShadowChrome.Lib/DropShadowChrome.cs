@@ -110,13 +110,26 @@ namespace DropShadowChrome.Lib
             "Density",
             typeof(double),
             typeof(DropShadowChrome),
-            new FrameworkPropertyMetadata(0.6));
+            new FrameworkPropertyMetadata(
+                0.6,
+                null,
+                (o, value) =>
+            {
+                var currentValue = (double) value;
+                if (currentValue < 0.0)
+                {
+                    return 0.0;
+                }
+
+                return currentValue > 1.0 ? 1.0 : value;
+            }));
 
         /// <summary>
-        /// Gets or sets the Density property. This is a dependency property.
+        /// Gets or sets a value that indicates the density of the surrounding border and the shadow.
+        /// This is a dependency property.
         /// </summary>
         /// <value>
-        ///
+        /// a <c>double</c> value between 0 and 1.0
         /// </value>
         [Bindable(true)]
         public double Density

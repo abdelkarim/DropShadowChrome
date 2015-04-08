@@ -13,7 +13,7 @@
     </Window.DataContext>
     
     <lib:DropShadowChrome.DropShadowChrome>
-        <lib:DropShadowChrome ShadowBrush="DarkGreen"/>
+        <lib:DropShadowChrome ShadowBrush="DarkGreen" Density="0.6" />
     </lib:DropShadowChrome.DropShadowChrome>
     
     <Grid>
