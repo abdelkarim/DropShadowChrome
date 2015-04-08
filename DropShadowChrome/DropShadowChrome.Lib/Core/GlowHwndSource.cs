@@ -30,7 +30,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
+using DropShadowChrome.Lib.Controls;
 
 namespace DropShadowChrome.Lib.Core
 {
@@ -41,9 +41,9 @@ namespace DropShadowChrome.Lib.Core
     {
         #region "Fields"
 
-        private Color _shadowColor;
-        private Brush _borderBrush;
+        private Brush _shadowBrush;
         private double _glowSize;
+        private double _density;
 
         #endregion
 
@@ -94,129 +94,41 @@ namespace DropShadowChrome.Lib.Core
 
         #endregion
 
-        #region "Properties"
-
-        public Brush BorderBrush
-        {
-            get { return _borderBrush; }
-            set
-            {
-                if (_borderBrush == value)
-                    return;
-
-                _borderBrush = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public Color ShadowColor
-        {
-            get { return _shadowColor; }
-            set
-            {
-                if (_shadowColor == value)
-                    return;
-
-                _shadowColor = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public double GlowSize
-        {
-            get { return _glowSize; }
-            set
-            {
-                if (_glowSize == value)
-                    return;
-
-                _glowSize = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        #endregion
-
         #region "Methods"
 
-        internal void InitializeRootVisual(Dock dock)
+        internal void InitializeRootVisual(DropShadowChrome chrome, Dock dock, double glowSize)
         {
-            var root = new Border
+            var glowControl = new GlowControl
             {
-                SnapsToDevicePixels = true,
-                ClipToBounds = true
+                Dock = dock
             };
-
-            var borderBrushBinding = new Binding
+            glowControl.SetBinding(Control.BackgroundProperty, new Binding
             {
-                Source = this,
-                Path = new PropertyPath("BorderBrush"),
+                Source = chrome,
+                Path = new PropertyPath("ShadowBrush"),
                 Mode = BindingMode.OneWay
-            };
-            var element = new Border
+            });
+
+            glowControl.SetBinding(UIElement.OpacityProperty, new Binding
             {
-                SnapsToDevicePixels = true,
-                Effect = GetShadowEffect()
-            };
+                Source = chrome,
+                Path = new PropertyPath("Density"),
+                Mode = BindingMode.OneWay
+            });
 
             switch (dock)
             {
                 case Dock.Right:
                 case Dock.Left:
-                    {
-                        element.Width = 1;
-                        element.Margin = new Thickness(0, 1, 0, 1);
-                        root.Width = GlowSize;
-                        break;
-                    }
-                case Dock.Bottom:
-                case Dock.Top:
-                    {
-                        element.Height = 1;
-                        element.Margin = new Thickness(3, 0, 3, 0);
-                        root.Height = GlowSize;
-                        break;
-                    }
-            }
-
-            switch (dock)
-            {
-                case Dock.Left:
-                    element.HorizontalAlignment = HorizontalAlignment.Right;
+                    glowControl.Width = glowSize;
                     break;
                 case Dock.Top:
-                    element.VerticalAlignment = VerticalAlignment.Bottom;
-                    break;
-                case Dock.Right:
-                    element.HorizontalAlignment = HorizontalAlignment.Left;
-                    break;
                 case Dock.Bottom:
-                    element.VerticalAlignment = VerticalAlignment.Top;
+                    glowControl.Height = glowSize;
                     break;
             }
 
-            element.SetBinding(Border.BackgroundProperty, borderBrushBinding);
-
-            root.Child = element;
-            RootVisual = root;
-        }
-
-        private DropShadowEffect GetShadowEffect()
-        {
-            var dropShadowColorBinding = new Binding
-            {
-                Source = this,
-                Path = new PropertyPath("ShadowColor"),
-                Mode = BindingMode.OneWay
-            };
-            var dropShadowEffect = new DropShadowEffect
-            {
-                ShadowDepth = 0,
-                BlurRadius = 8
-            };
-            BindingOperations.SetBinding(dropShadowEffect, DropShadowEffect.ColorProperty, dropShadowColorBinding);
-
-            return dropShadowEffect;
+            RootVisual = glowControl;
         }
 
         #endregion
@@ -225,7 +137,7 @@ namespace DropShadowChrome.Lib.Core
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        protected internal virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             var handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));

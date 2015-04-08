@@ -26,9 +26,7 @@ SOFTWARE.
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/DropShadowChrome.Lib;component/Themes/Brushes.xaml" />
-        <ResourceDictionary Source="/DropShadowChrome.Lib;component/Themes/Shared.xaml" />
-        <ResourceDictionary Source="/DropShadowChrome.Lib;component/Themes/XWindow.Office2013.xaml" />
+        <ResourceDictionary Source="/DropShadowChrome.Lib;component/Themes/GlowControl.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
 </ResourceDictionary>

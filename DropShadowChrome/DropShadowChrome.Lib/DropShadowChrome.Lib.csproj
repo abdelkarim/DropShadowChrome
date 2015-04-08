@@ -52,25 +52,18 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\OutlineTextBlock.cs" />
-    <Compile Include="Core\MENUITEMINFO.cs" />
-    <Compile Include="Core\MF.cs" />
+    <Compile Include="Controls\GlowControl.cs" />
+    <Compile Include="Controls\Primitives\SingleCellGrid.cs" />
     <Compile Include="Core\DropShadowWorker.cs" />
     <Compile Include="Core\GlowHwndSource.cs" />
-    <Compile Include="Core\MFS.cs" />
     <Compile Include="Core\NativeMethods.cs" />
     <Compile Include="Core\POINT.cs" />
     <Compile Include="Core\RECT.cs" />
-    <Compile Include="Core\SC.cs" />
     <Compile Include="Core\SW.cs" />
     <Compile Include="Core\SWP.cs" />
-    <Compile Include="Core\TPM.cs" />
-    <Compile Include="Core\VM.cs" />
     <Compile Include="Core\WS.cs" />
     <Compile Include="Core\WS_EX.cs" />
     <Compile Include="DropShadowChrome.cs" />
-    <Compile Include="Core\MFT.cs" />
-    <Compile Include="Core\MIIM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -84,11 +77,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="SystemMenuBase.cs" />
-    <Compile Include="SystemMenuItem.cs" />
-    <Compile Include="SystemMenuSeparator.cs" />
-    <Compile Include="WindowCommands.cs" />
-    <Compile Include="XWindow.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -103,21 +91,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Themes\Brushes.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\Shared.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="Themes\GlowControl.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\XWindow.Office2013.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

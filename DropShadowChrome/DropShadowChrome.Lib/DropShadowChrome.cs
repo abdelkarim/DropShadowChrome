@@ -75,54 +75,54 @@ namespace DropShadowChrome.Lib
 
         #endregion
 
-        #region DropShadowColor
+        #region ShadowBrush
 
         /// <summary>
-        /// Identifies the <see cref="DropShadowColor"/> dependency property.
+        /// Identifies the <see cref="ShadowBrush"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty DropShadowColorProperty = DependencyProperty.Register(
-            "DropShadowColor",
-            typeof(Color),
-            typeof(DropShadowChrome),
-            new FrameworkPropertyMetadata(Colors.Transparent));
-
-        /// <summary>
-        /// Gets or sets the DropShadowColor property. This is a dependency property.
-        /// </summary>
-        /// <value>
-        ///
-        /// </value>
-        [Bindable(true)]
-        public Color DropShadowColor
-        {
-            get { return (Color)GetValue(DropShadowColorProperty); }
-            set { SetValue(DropShadowColorProperty, value); }
-        }
-
-        #endregion
-
-        #region BorderBrush
-
-        /// <summary>
-        /// Identifies the <see cref="BorderBrush"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty BorderBrushProperty = DependencyProperty.Register(
-            "BorderBrush",
+        public static readonly DependencyProperty ShadowBrushProperty = DependencyProperty.Register(
+            "ShadowBrush",
             typeof(Brush),
             typeof(DropShadowChrome),
             new FrameworkPropertyMetadata(null));
 
         /// <summary>
-        /// Gets or sets the BorderBrush property. This is a dependency property.
+        /// Gets or sets the ShadowBrush property. This is a dependency property.
         /// </summary>
         /// <value>
         ///
         /// </value>
         [Bindable(true)]
-        public Brush BorderBrush
+        public Brush ShadowBrush
         {
-            get { return (Brush)GetValue(BorderBrushProperty); }
-            set { SetValue(BorderBrushProperty, value); }
+            get { return (Brush)GetValue(ShadowBrushProperty); }
+            set { SetValue(ShadowBrushProperty, value); }
+        }
+
+        #endregion
+
+        #region Density
+
+        /// <summary>
+        /// Identifies the <see cref="Density"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty DensityProperty = DependencyProperty.Register(
+            "Density",
+            typeof(double),
+            typeof(DropShadowChrome),
+            new FrameworkPropertyMetadata(0.7));
+
+        /// <summary>
+        /// Gets or sets the Density property. This is a dependency property.
+        /// </summary>
+        /// <value>
+        ///
+        /// </value>
+        [Bindable(true)]
+        public double Density
+        {
+            get { return (double)GetValue(DensityProperty); }
+            set { SetValue(DensityProperty, value); }
         }
 
         #endregion

@@ -26,6 +26,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Threading;
 
 namespace DropShadowChrome.Lib.Core
 {
@@ -39,13 +40,15 @@ namespace DropShadowChrome.Lib.Core
         private Window _window;
         private DropShadowChrome _dropShadow;
         private IntPtr _wndHandle;
-        private const int GlowSize = 6;
+        private const int GLOW_SIZE = 8;
         private GlowHwndSource[] _glowWindows = new GlowHwndSource[4];
         private GlowHwndSource _topGlowWnd;
         private GlowHwndSource _leftGlowWnd;
         private GlowHwndSource _bottomGlowWnd;
         private GlowHwndSource _rightGlowWnd;
         private bool _isGlowWindowsInitialized;
+        private DispatcherTimer _delayTimer;
+        private bool _delay;
 
         #endregion
 
@@ -122,7 +125,10 @@ namespace DropShadowChrome.Lib.Core
                 return;
 
             if (_window.WindowState == WindowState.Normal)
+            {
+                _delay = true;
                 ShowGlowWindows();
+            }
             else
                 HideGlowWindows();
         }
@@ -153,36 +159,36 @@ namespace DropShadowChrome.Lib.Core
             var uFlags = SWP.NOACTIVATE;
 
             NativeMethods.SetWindowPos(_topGlowWnd.Handle,
-                                       IntPtr.Zero,
-                                       (int)(newRect.Left - 4),
-                                       (int)(newRect.Top - GlowSize),
-                                       (int)(newRect.Width + 8),
-                                       GlowSize,
-                                       uFlags);
+                IntPtr.Zero,
+                (int)(newRect.Left - GLOW_SIZE),
+                (int)(newRect.Top - GLOW_SIZE),
+                (int)(newRect.Width + (GLOW_SIZE * 2)),
+                GLOW_SIZE,
+                uFlags);
 
             NativeMethods.SetWindowPos(_bottomGlowWnd.Handle,
-                                       IntPtr.Zero,
-                                       (int)(newRect.Left - 4),
-                                       (int)(newRect.Top + newRect.Height),
-                                       (int)(newRect.Width + 8),
-                                       GlowSize,
-                                       uFlags);
+                IntPtr.Zero,
+                (int)(newRect.Left - GLOW_SIZE),
+                (int)(newRect.Top + newRect.Height),
+                (int)(newRect.Width + (GLOW_SIZE * 2)),
+                GLOW_SIZE,
+                uFlags);
 
             NativeMethods.SetWindowPos(_leftGlowWnd.Handle,
-                                       IntPtr.Zero,
-                                       (int)(newRect.Left - GlowSize),
-                                       (int)(newRect.Top - 2)
-                                       , GlowSize
-                                       , (int)(newRect.Height + 4),
-                                       uFlags);
+                IntPtr.Zero,
+                (int)(newRect.Left - GLOW_SIZE),
+                (int)(newRect.Top - GLOW_SIZE)
+                , GLOW_SIZE
+                , (int)(newRect.Height + (GLOW_SIZE * 2)),
+                uFlags);
 
             NativeMethods.SetWindowPos(_rightGlowWnd.Handle,
-                                       IntPtr.Zero,
-                                       (int)(newRect.Left + newRect.Width),
-                                       (int)(newRect.Top - 2),
-                                       GlowSize,
-                                       (int)(newRect.Height + 4),
-                                       uFlags);
+                IntPtr.Zero,
+                (int)(newRect.Left + newRect.Width),
+                (int)(newRect.Top - GLOW_SIZE),
+                GLOW_SIZE,
+                (int)(newRect.Height + (GLOW_SIZE * 2)),
+                uFlags);
         }
 
         private void OnSourceInitialized(object sender,
@@ -230,45 +236,45 @@ namespace DropShadowChrome.Lib.Core
             else
                 InvalidateGlowWindows();
 
+            _delay = true;
             ShowGlowWindows();
         }
 
         private void InvalidateGlowWindows()
         {
-            var newShadow = _dropShadow;
+            /*var newShadow = _dropShadow;
             foreach (var glowHwndSource in _glowWindows)
             {
-                glowHwndSource.BorderBrush = newShadow.BorderBrush;
-                glowHwndSource.ShadowColor = newShadow.DropShadowColor;
-            }
+                glowHwndSource.ShadowBrush = newShadow.ShadowBrush;
+            }*/
         }
 
         private void InitializeGlowWindows()
         {
             var rect = GetWindowRect();
 
-            _topGlowWnd = _glowWindows[0] = CreateGlowWindow((int)(rect.Width + 8),
-                                           GlowSize,
-                                           (int)(rect.Left - 4),
-                                           (int)(rect.Top - GlowSize),
+            _topGlowWnd = _glowWindows[0] = CreateGlowWindow((int)(rect.Width + (GLOW_SIZE * 2)),
+                                           GLOW_SIZE,
+                                           (int)(rect.Left - GLOW_SIZE),
+                                           (int)(rect.Top - GLOW_SIZE),
                                            Dock.Top);
 
-            _bottomGlowWnd = _glowWindows[1] = CreateGlowWindow((int)(rect.Width + 8),
-                                              GlowSize,
-                                              (int)(rect.Left - 4),
+            _bottomGlowWnd = _glowWindows[1] = CreateGlowWindow((int)(rect.Width + (GLOW_SIZE * 2)),
+                                              GLOW_SIZE,
+                                              (int)(rect.Left - GLOW_SIZE),
                                               (int)(rect.Top + rect.Height),
                                               Dock.Bottom);
 
-            _leftGlowWnd = _glowWindows[2] = CreateGlowWindow(GlowSize,
-                                            (int)(rect.Height + 4),
-                                            (int)(rect.Left - GlowSize),
-                                            (int)(rect.Top - 2),
+            _leftGlowWnd = _glowWindows[2] = CreateGlowWindow(GLOW_SIZE,
+                                            (int)(rect.Height + (GLOW_SIZE * 2)),
+                                            (int)(rect.Left - GLOW_SIZE),
+                                            (int)(rect.Top - GLOW_SIZE),
                                             Dock.Left);
 
-            _rightGlowWnd = _glowWindows[3] = CreateGlowWindow(GlowSize,
-                                             (int)(rect.Height + 4),
+            _rightGlowWnd = _glowWindows[3] = CreateGlowWindow(GLOW_SIZE,
+                                             (int)(rect.Height + (GLOW_SIZE * 2)),
                                              (int)(rect.Left + rect.Width),
-                                             (int)(rect.Top - 2),
+                                             (int)(rect.Top - GLOW_SIZE),
                                              Dock.Right);
             _isGlowWindowsInitialized = true;
         }
@@ -293,14 +299,8 @@ namespace DropShadowChrome.Lib.Core
                 WindowStyle = (int)windowStyle,
                 ExtendedWindowStyle = extendedWindowStyle
             };
-            var hwndSource = new GlowHwndSource(parameters)
-            {
-                GlowSize = GlowSize,
-                BorderBrush = _dropShadow.BorderBrush,
-                ShadowColor = _dropShadow.DropShadowColor
-            };
-            hwndSource.InitializeRootVisual(dock);
-
+            var hwndSource = new GlowHwndSource(parameters);
+            hwndSource.InitializeRootVisual(_dropShadow, dock, GLOW_SIZE);
             return hwndSource;
         }
 
@@ -309,14 +309,33 @@ namespace DropShadowChrome.Lib.Core
             if (_window.WindowState == WindowState.Maximized)
                 return;
 
+            if (SystemParameters.MinimizeAnimation && _delay)
+            {
+                _delayTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(270),
+                    DispatcherPriority.Normal,
+                    OnDelayShowGlow,
+                    Dispatcher.CurrentDispatcher);
+                _delayTimer.Start();
+                return;
+            }
+
             foreach (var hwndSource in _glowWindows)
+            {
                 NativeMethods.ShowWindow(hwndSource.Handle, (int)SW.SHOWNOACTIVATE);
+            }
+        }
+
+        private void OnDelayShowGlow(object sender, EventArgs eventArgs)
+        {
+            _delayTimer.Stop();
+            _delay = false;
+            ShowGlowWindows();
         }
 
         private void HideGlowWindows()
         {
             foreach (var glowWindow in _glowWindows)
-                NativeMethods.ShowWindow(glowWindow.Handle, (int) SW.HIDE);
+                NativeMethods.ShowWindow(glowWindow.Handle, (int)SW.HIDE);
         }
 
         private void RemoveShadowElements()

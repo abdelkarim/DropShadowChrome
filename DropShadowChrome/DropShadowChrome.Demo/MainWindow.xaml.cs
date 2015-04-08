@@ -1,7 +1,4 @@
-﻿using System.Windows;
-using DropShadowChrome.Lib;
-
-namespace DropShadowChrome.Demo
+﻿namespace DropShadowChrome.Demo
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -11,13 +8,6 @@ namespace DropShadowChrome.Demo
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void SystemMenuItem_OnClick(object sender,
-                                            RoutedEventArgs e)
-        {
-            var systemMenuItem = (SystemMenuItem) sender;
-            MessageBox.Show(systemMenuItem.Header);
         }
     }
 }

@@ -1,0 +1,52 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:DropShadowChrome.Lib.Controls"
+                    xmlns:primitives="clr-namespace:DropShadowChrome.Lib.Controls.Primitives">
+
+    <Style x:Key="{x:Type controls:GlowControl}" TargetType="{x:Type controls:GlowControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:GlowControl}">
+                    <primitives:SingleCellGrid x:Name="Root">
+                        <Border Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="True" />
+                        <Border x:Name="ShadowBorder"
+                                Background="{TemplateBinding Background}"
+                                Opacity="1">
+                            <Border.Effect>
+                                <BlurEffect Radius="8" />
+                            </Border.Effect>
+                        </Border>
+                    </primitives:SingleCellGrid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Dock" Value="Right">
+                            <Setter TargetName="Root" Property="HorizontalAlignment" Value="Left" />
+                            <Setter TargetName="Root" Property="Width" Value="1" />
+                            <Setter TargetName="Root" Property="Margin" Value="0,8" />
+                            <Setter TargetName="ShadowBorder" Property="Margin" Value="-2,0" />
+                        </Trigger>
+                        <Trigger Property="Dock" Value="Left">
+                            <Setter TargetName="Root" Property="HorizontalAlignment" Value="Right" />
+                            <Setter TargetName="Root" Property="Width" Value="1" />
+                            <Setter TargetName="Root" Property="Margin" Value="0,8" />
+                            <Setter TargetName="ShadowBorder" Property="Margin" Value="-2,0" />
+                        </Trigger>
+                        <Trigger Property="Dock" Value="Top">
+                            <Setter TargetName="Root" Property="VerticalAlignment" Value="Bottom" />
+                            <Setter TargetName="Root" Property="Height" Value="1" />
+                            <Setter TargetName="Root" Property="Margin" Value="7,0" />
+                            <Setter TargetName="ShadowBorder" Property="Margin" Value="0,-2" />
+                        </Trigger>
+                        <Trigger Property="Dock" Value="Bottom">
+                            <Setter TargetName="Root" Property="VerticalAlignment" Value="Top" />
+                            <Setter TargetName="Root" Property="Height" Value="1" />
+                            <Setter TargetName="Root" Property="Margin" Value="7,0" />
+                            <Setter TargetName="ShadowBorder" Property="Margin" Value="0,-2" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
