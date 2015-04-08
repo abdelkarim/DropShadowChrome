@@ -57,22 +57,5 @@ namespace DropShadowChrome.Lib.Core
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-
-        /// <summary>
-        /// Places (posts) a message in the message queue associated with the thread that
-        /// created the specified window and returns without waiting for the thread to process the message.
-        /// </summary>
-        [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="lpPoint"></param>
-        /// <returns></returns>
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool GetCursorPos(out POINT lpPoint);
     }
 }

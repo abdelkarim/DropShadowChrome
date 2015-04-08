@@ -49,6 +49,8 @@ namespace DropShadowChrome.Lib.Core
         private bool _isGlowWindowsInitialized;
         private DispatcherTimer _delayTimer;
         private bool _delay;
+        private static IntPtr HWND_NOTOPMOST = new IntPtr(-2);
+        private static SWP WndPlacementFlags = SWP.NOACTIVATE;
 
         #endregion
 
@@ -153,42 +155,50 @@ namespace DropShadowChrome.Lib.Core
         private void InvalidateGlowsRect()
         {
             if (_wndHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
             var newRect = GetWindowRect();
-            var uFlags = SWP.NOACTIVATE;
+
+            var left = (int)(newRect.Left - GLOW_SIZE);
+            var right = (int)(newRect.Left + newRect.Width);
+            var top = (int)(newRect.Top - GLOW_SIZE);
+            var bottom = (int)(newRect.Top + newRect.Height);
+            var width = (int)(newRect.Width + (GLOW_SIZE * 2));
+            var height = (int)(newRect.Height + (GLOW_SIZE * 2));
 
             NativeMethods.SetWindowPos(_topGlowWnd.Handle,
-                IntPtr.Zero,
-                (int)(newRect.Left - GLOW_SIZE),
-                (int)(newRect.Top - GLOW_SIZE),
-                (int)(newRect.Width + (GLOW_SIZE * 2)),
+                HWND_NOTOPMOST, 
+                left,
+                top,
+                width,
                 GLOW_SIZE,
-                uFlags);
+                WndPlacementFlags);
 
             NativeMethods.SetWindowPos(_bottomGlowWnd.Handle,
-                IntPtr.Zero,
-                (int)(newRect.Left - GLOW_SIZE),
-                (int)(newRect.Top + newRect.Height),
-                (int)(newRect.Width + (GLOW_SIZE * 2)),
+                HWND_NOTOPMOST,
+                left,
+                bottom,
+                width,
                 GLOW_SIZE,
-                uFlags);
+                WndPlacementFlags);
 
             NativeMethods.SetWindowPos(_leftGlowWnd.Handle,
-                IntPtr.Zero,
-                (int)(newRect.Left - GLOW_SIZE),
-                (int)(newRect.Top - GLOW_SIZE)
+                HWND_NOTOPMOST,
+                left,
+                top
                 , GLOW_SIZE
-                , (int)(newRect.Height + (GLOW_SIZE * 2)),
-                uFlags);
+                , height,
+                WndPlacementFlags);
 
             NativeMethods.SetWindowPos(_rightGlowWnd.Handle,
-                IntPtr.Zero,
-                (int)(newRect.Left + newRect.Width),
-                (int)(newRect.Top - GLOW_SIZE),
+                HWND_NOTOPMOST,
+                right,
+                top,
                 GLOW_SIZE,
-                (int)(newRect.Height + (GLOW_SIZE * 2)),
-                uFlags);
+                height,
+                WndPlacementFlags);
         }
 
         private void OnSourceInitialized(object sender,
