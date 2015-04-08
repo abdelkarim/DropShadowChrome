@@ -15,6 +15,6 @@ To install the library you can directly grab the binaries from the **Releases** 
 Below is the XAML snippet used to render the above screenshot:
 ``` xml
 <lib:DropShadowChrome.DropShadowChrome>
-    <lib:DropShadowChrome ShadowBrush="DarkGreen"/>
+    <lib:DropShadowChrome ShadowBrush="DarkGreen" Density="0.6"/>
 </lib:DropShadowChrome.DropShadowChrome>
 ```
